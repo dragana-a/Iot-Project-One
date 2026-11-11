@@ -3,14 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <script src="index.js" defer></script>
 
     <title>ESP32 Sensor Dashboard</title>
-
 </head>
 
 <body>
+    <div class="sensor">
+        <h2>Dial: <span id="resistor">--</span>%</h2>
+        <progress
+            id="resistorBar"
+            value="0"
+            max="100">
+        </progress>
+    </div>
+    <div class="senor">
 
 
+        <h2>
+            Microphone (raw): 
+            <span id="microphone">--</span>
+            <span id="measurementType"></span>
+        </h2>
+
+        <progress id="microphoneBar"></progress>
+
+
+        <div class="loudness-container">
+            <h2>Loudness Level: <span id="loudnessLevel">--</span>/10</h2>
+
+            <img
+                id="loudnessImage"
+                src="/images/loudness-1.jpg"
+                alt="Microphone loudness"
+            />
+        </div>
+    </div>
+
+  <button onclick="changeMicMode()">Change Between Decibels and Hertz</button>
+  <p id="status">Connecting...</p>
+
+  
     <footer>
         <p>created by: Ebenezer Fanta & Dragana Acamovic</p>
         <p>Student IDs: [000928925][000833869]</p>

@@ -1,0 +1,42 @@
+
+.sensor-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.sensor {
+    margin-bottom: 30px;
+}
+
+.microphoneBar, .resistorBar {
+    width: 100%;
+    height: 25px;
+    accent-color: hotpink;
+}
+
+.sensor h2 {
+    margin-bottom: 10px;
+}
+
+
+.error { color: red; font-weight: bold; }
+.ok    { color: green; }
+
+
+.loudness-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#loudnessImage {
+    width: 250px;
+    height: 250px;
+    object-fit: contain;
+    border-radius: 15px;
+    transition: opacity 0.2s ease;
+}
+
+#loudnessImage[hidden] {
+    display: none;
+}
