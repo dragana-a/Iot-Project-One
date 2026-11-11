@@ -1,6 +1,24 @@
 const TIMEOUT = 1500;
 const UPDATE_TIMER = 200;
+const MAX_LOG_ENTRIES = 20;
 
+function addLogEntry(data){
+    const log = document.getElementById("dataLog");
+    const entry = document.createElement("li");
+
+    const time = new Date().toLocaleDateString();
+    const unit = data.decibelMode ? "dB" : "Hz";
+    const dial = data.resistorOk ? data.resistor + "%" : "--";
+    const mic = data.micOk ? data.microphone + " " + unit : "--";
+
+    entry.textContent = `${time} | Dial: ${dial} | Mic: ${mic}`;
+
+    log.prepend(entry);
+
+    while (log.children.length > MAX_LOG_ENTRIES) {
+        log.lastElementChild.remove();
+    }
+}
 
 function showStatus(message, isError){
     const status = document.getElementById("status");
@@ -51,6 +69,7 @@ async function updateSensors() {
     try {
 
         const data = await fetchJSON("/data");
+        addLogEntry(data);
 
         //store sensor failiures
         const problems = [];
@@ -68,7 +87,7 @@ async function updateSensors() {
             const microphoneBar =
                 document.getElementById("microphoneBar");
     
-            microphoneBar.max = data.decibelMode ? 90 : 5000;
+            microphoneBar.max = data.decibelMode ? 57 : 4000;
     
             microphoneBar.value = Math.max(
                 0,
@@ -97,10 +116,11 @@ async function updateSensors() {
             document.getElementById("loudnessLevel");
 
         if (data.decibelMode) {
-            const maxDB = 60; // Adjustable reference value
+            const maxDB = 57; 
+            const minDB = 25;
 
             let level = Math.ceil(
-                (Number(data.microphone) / maxDB) * 10
+                ((Number(data.microphone) - minDB) / (maxDB - minDB)) * 10   
             );
 
             level = Math.max(1, Math.min(10, level));

@@ -34,6 +34,7 @@ int SAMPLES_PER_SECOND = 8000;
 //global sensor data to be sent to html page
 int variableResistorPercentage = 0;
 float microphoneVal = 0;
+float DB_OFFSET = 15; //tested from phone decibel tracker to get a more accurate representation of the real decibels
 bool decibelMode = true;
 
 //error checking
@@ -56,6 +57,7 @@ void setup() {
 
   // setup serial debug port
   Serial.begin(115200);
+  delay(5000);
 
   // init filesystem
   if(!LittleFS.begin(true, "/littlefs")){
@@ -157,8 +159,9 @@ void getDecibels(){
 	micOk = true;
 
 	if(peakToPeak < 1) peakToPeak = 1;
-	microphoneVal = 20 * log10(peakToPeak / 1.0);
-	// Serial.printf("Decibels: %.1f dB\n", microphoneVal);
+	microphoneVal = 20 * log10(peakToPeak / 1.0) - DB_OFFSET;
+	if(microphoneVal < 0) microphoneVal = 0;
+	Serial.printf("Decibels: %.1f dB\n", microphoneVal);
 }
 
 void getHertz(){
@@ -191,7 +194,7 @@ void getHertz(){
 	micOk = true;
 
 	microphoneVal = crossings / (COLLECTION_TIME / 1000.0); 
-	// Serial.printf("Frequency: %.1f Hz\n", microphoneVal);
+	Serial.printf("Frequency: %.1f Hz\n", microphoneVal);
   
 }
  
@@ -212,7 +215,7 @@ void readResistor(){
 	float percent = (sensorVal / 4095.0) * 100.0; 
 
 	variableResistorPercentage = round(percent); 
-//   Serial.printf("Percentage: %d %%\n", variableResistorPercentage);
+  Serial.printf("Percentage: %d %%\n", variableResistorPercentage);
 }
 
 // *********************************************************************
