@@ -200,24 +200,41 @@ void getHertz(){
  
 
 //read the resistor val and return the percentage 
-void readResistor(){
-	int sensorVal = analogRead(PIN_VARIABLE_RES);
-	//a connected dial stays steady between loops; a removed dial drifts randomly
-	if(lastResistorVal != -1 && abs(sensorVal - lastResistorVal) > 500){   
-		resistorOk = false;
-	} else {
-		resistorOk = true;
-	}
-	lastResistorVal = sensorVal;   
+void readResistor() {
+    int minVal = 4095;
+    int maxVal = 0;
+    long total = 0;
 
-	if(!resistorOk) return;        
+    // Take 20 readings
+    for (int i = 0; i < 20; i++) {
+        int raw = analogRead(PIN_VARIABLE_RES);
 
-	float percent = (sensorVal / 4095.0) * 100.0; 
+        if (raw < minVal) minVal = raw;
+        if (raw > maxVal) maxVal = raw;
 
-	variableResistorPercentage = round(percent); 
-  Serial.printf("Percentage: %d %%\n", variableResistorPercentage);
+        total += raw;
+        delayMicroseconds(500);
+    }
+
+    int difference = maxVal - minVal;
+
+    // Detect unstable readings
+    resistorOk = difference < 150;
+
+    if (!resistorOk) {
+        Serial.println("Dial may be disconnected!");
+        return;
+    }
+
+    int average = total / 20;
+
+    float percent = (average / 4095.0) * 100.0;
+
+    variableResistorPercentage = round(percent);
+
+    Serial.printf("Dial: %d%% | Fluctuation: %d\n",
+                  variableResistorPercentage, difference);
 }
-
 // *********************************************************************
 // loop ()
 //

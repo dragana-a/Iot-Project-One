@@ -20,11 +20,15 @@ function addLogEntry(data){
     }
 }
 
+
+
 function showStatus(message, isError){
     const status = document.getElementById("status");
     status.textContent = message;
     status.className = isError ? "error" : "ok";
 }
+
+
 
 async function fetchJSON(route){
     const control = new AbortController();
@@ -54,6 +58,8 @@ async function fetchJSON(route){
     }
 }
 
+
+
 async function changeMicMode(){
     try {
         const res = await fetch("/changeMode", {cache: "no-store"});
@@ -63,6 +69,7 @@ async function changeMicMode(){
         console.error("Error changing mic:", error);
     }   
 }
+
 
 
 async function updateSensors() {
@@ -88,6 +95,7 @@ async function updateSensors() {
                 document.getElementById("microphoneBar");
     
             microphoneBar.max = data.decibelMode ? 57 : 4000;
+
     
             microphoneBar.value = Math.max(
                 0,
@@ -101,6 +109,8 @@ async function updateSensors() {
 
 
         document.getElementById("measurementType").textContent = (data.decibelMode) ? "dB" : "Hz";
+
+        document.getElementById("dbOrHertz").textContent = (data.decibelMode) ? "Loudness" : "Depth";
 
         if(problems.length > 0){
             showStatus(problems.join(" | "), true);
@@ -136,12 +146,27 @@ async function updateSensors() {
                 loudnessImage.dataset.level = level;
             }
         } else {
-            loudnessLevel.textContent = "--";
-            loudnessImage.hidden = true;
+            const maxHertz = 1000;
+            const minHertz = 0; 
+
+            let level = Math.ceil(
+                ((Number(data.microphone) - minHertz) / (maxHertz - minHertz)) * 8   
+            );
+
+            level = Math.max(1, Math.min(8, level));
+
+            loudnessLevel.textContent = level;
+
+            loudnessImage.hidden = false;
+
+            if (loudnessImage.dataset.level != level) {
+                loudnessImage.src =
+                    "/images/hertz-" + level + ".jpeg";
+
+                loudnessImage.dataset.level = level;
+            }
         }
-
-
-
+    
     } catch (error) {
         showStatus(error.message, true);
         console.error("Error getting readings:", error);
